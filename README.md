@@ -30,26 +30,27 @@ cgiNode enables a Node.JS instance to run on any server that supports CGI. It is
 
 ## Getting Started
 
-1. Install Node.JS. If you are on a shared server with SSH access, I suggest you try out [NVM](https://github.com/creationix/nvm). Otherwise you can easily install Node on a shared/limited server environment with niutech's [Node.php](https://github.com/niutech/node.php) file.
-2. [Download]() cgiNode.js from the ```dist``` directory.
-3. Move or upload the file to your project's cgi-bin directory and ```chmod 755 cgiNode.js```.
-4. Edit the top line of cgiNode.js so it points to the directory of your installed Node.JS binary.
+* Install Node.JS. If you are on a shared server with SSH access, I suggest you try out [NVM](https://github.com/creationix/nvm). Otherwise you can easily install Node on a shared/limited server environment with niutech's [Node.php](https://github.com/niutech/node.php) file.
+* [Download]() cgiNode.js from the ```dist``` directory.
+* Move or upload the file to your project's cgi-bin directory and ```chmod 755 cgiNode.js```.
+* Edit the top line of cgiNode.js so it points to the directory of your installed Node.JS binary.
 ```sh
   #!/usr/bin/node
 ```
-5. Add an Action handler for cgiNode to your ```.htaccess``` file.
+* Add an Action handler for cgiNode to your ```.htaccess``` file.
 
 ```
 Action cgiNode /cgi-bin/cgiNode.js
 AddHandler cgiNode .jsml
 ```
-6. Create a file with a ```.jsml``` extension (or whatever you feel like naming it in ```.htaccess```), and add code that looks like this.
+* Create a file with a ```.jsml``` extension (or whatever you feel like naming it in ```.htaccess```), and add code that looks like this.
 ```
 <? node.include(app.js) ?>
+```
 
 Assuming your JS file is named ```app.js```, and residing in the same directory as your JSML file.
 
-7. Edit app.js like you would any Node JS file.
+* Edit app.js like you would any Node JS file.
 
 ## API
 
