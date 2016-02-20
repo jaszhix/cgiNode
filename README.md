@@ -38,6 +38,22 @@ cgiNode enables a Node.JS instance to run on any server that supports CGI. It is
 ```sh
   #!/usr/bin/node
 ```
+* Edit the config option in cgiNode.js. It looks like this:
+
+```js
+var config = {
+  version: '0.3',
+  openTag: '<?',
+  closeTag: '?>',
+  scriptExtension: '.js', // Set the script extension
+  embededScriptExtensions: ['.jsml'],
+  SessionCookie: 'NODE-SESSIONID',
+  SessionTimeOut: 15 * 60, // 15 minutes
+  SessionPath: process.env.CGI_NODE_SESSIONDIR || '/path/to/session/dir/',
+  logPath: '/path/to/log/file/' // Ensure there is a forward slash at the end
+};
+```
+
 * Add an Action handler for cgiNode to your ```.htaccess``` file.
 
 ```
