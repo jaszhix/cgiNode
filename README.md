@@ -17,6 +17,7 @@ cgiNode enables a Node.JS instance to run on any server that supports CGI. It is
 
 ## Differences From Original Project
 
+* Targeting Node.JS 4.x.x LTS
 * Promise exception handling.
 * Debug logging.
 * DOM JS Pass-through.
