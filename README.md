@@ -38,20 +38,19 @@ cgiNode enables a Node.JS instance to run on any server that supports CGI. It is
 ```sh
   #!/usr/bin/node
 ```
-* Edit the config option in cgiNode.js. It looks like this:
+* Edit the config.json file in src, and copy it to your cgi-bin directory. It looks like this:
 
-```js
-var config = {
-  version: '0.3',
-  openTag: '<?',
-  closeTag: '?>',
-  scriptExtension: '.js', // Set the script extension
-  embededScriptExtensions: ['.jsml'],
-  SessionCookie: 'NODE-SESSIONID',
-  SessionTimeOut: 15 * 60, // 15 minutes
-  SessionPath: process.env.CGI_NODE_SESSIONDIR || '/path/to/session/dir/',
-  logPath: '/path/to/log/file/' // Ensure there is a forward slash at the end
-};
+```json
+{
+  "openTag": "<?",
+  "closeTag": "?>",
+  "scriptExtension": ".js",
+  "embededScriptExtensions": ".jsml",
+  "sessionCookie": "NODE-SESSIONID",
+  "sessionTimeOut": "1800000",
+  "sessionPath": "/path/to/session/dir/",
+  "logPath": "/path/to/debug.json"
+}
 ```
 
 * Add an Action handler for cgiNode to your ```.htaccess``` file.
@@ -91,7 +90,7 @@ Displays the server information, similar to ```phpInfo()```.
 
 Injects JS into the JSML page's script tags for the browser to interpret. This is useful if you are trying to build an isomorphic/universal application, and need to add client side JS. The major caveat to this is you do not have any access to the browser's scope.
 
-### console.log(args)
+### console.log(args), console.warn(args), console.error(args)
 
 Allows you to see console logging in your browser's console from the Node.JS scope.
 
