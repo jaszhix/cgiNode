@@ -194,7 +194,10 @@ function node(onFinished) {
       this.script(`console.log(${JSON.stringify(JSON.decycle(value))})`);
     },
     warn: (value)=>{
-      this.script(`console.log(${value})`);
+      this.script(`console.warn(${JSON.stringify(JSON.decycle(value))})`);
+    },
+    error: (value)=>{
+      this.script(`console.error(${JSON.stringify(JSON.decycle(value))})`);
     }
   };
   node.prototype.timeNow = new Date(Date.now());
