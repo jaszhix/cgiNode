@@ -203,7 +203,7 @@ function node(onFinished) {
       data: data
     };
     var output = JSON.stringify(json);
-    fs.appendFile(`${config.logPath}debug.log`, output + '\n', {
+    fs.appendFile(`${config.logPath}`, output + '\n', {
       flags: 'w'
     });
   }; 
