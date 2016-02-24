@@ -1,5 +1,4 @@
 {
-  "version": "0.3",
   "openTag": "<?",
   "closeTag": "?>",
   "scriptExtension": ".js",
@@ -7,5 +6,5 @@
   "sessionCookie": "NODE-SESSIONID",
   "sessionTimeOut": "1800000",
   "sessionPath": "/media/jason/PrimaryHDD/www/sessions/",
-  "logPath": "/media/jason/PrimaryHDD/www/jaszhix/"
+  "logPath": "/media/jason/PrimaryHDD/www/jaszhix/debug.json"
 }
