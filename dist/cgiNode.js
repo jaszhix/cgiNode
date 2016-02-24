@@ -3,7 +3,12 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-// cycle.js - https://github.com/douglascrockford/JSON-js/blob/master/cycle.js
+//#!/home2/jaszhiz/.nvm/versions/node/v4.3.0/bin/node
+
+/*
+cycle.js - https://github.com/douglascrockford/JSON-js/blob/master/cycle.js
+*/
+
 "function" != typeof JSON.decycle && (JSON.decycle = function (e) {
   "use strict";
   var t = [],
@@ -35,27 +40,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 cgiNode2
 Based on the work of Uei Richo (Uei.Richo@gmail.com) - https://github.com/UeiRicho/cgi-node
 */
-var vm = require('vm');
+
 var fs = require('fs');
+var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+config.sessionTimeOut = parseInt(config.sessionTimeOut);
+config.version = '0.3';
+var vm = require('vm');
 var url = require('url');
 var Path = require('path');
 var crypto = require('crypto');
 var queryString = require('querystring');
-var config = {
-  version: '0.3',
-
-  openTag: '<?',
-  closeTag: '?>',
-
-  scriptExtension: '.js', // Not being used yet.
-
-  embededScriptExtensions: ['.jsml'], // Not being used yet.
-
-  SessionCookie: 'NODE-SESSIONID',
-  SessionTimeOut: 15 * 60, // 15 minutes
-  SessionPath: process.env.CGI_NODE_SESSIONDIR || '/media/jason/PrimaryHDD/www/sessions/',
-  logPath: '/media/jason/PrimaryHDD/www/jaszhix/'
-};
 
 function node(onFinished) {
   var _this = this;
@@ -63,7 +57,6 @@ function node(onFinished) {
   if (!(this instanceof node)) {
     return new node(onFinished);
   }
-  //var this = this;
   node.prototype.node = this;
   /*
    This array contains all the scripts that have been included within the session.
@@ -214,9 +207,11 @@ function node(onFinished) {
 
     _this.response.write('</table>');
   };
+
   /*
   DOM Context Pass-through
   */
+
   node.prototype.script = function (code) {
     return _this.response.write("<script>" + code + "</script>");
   };
@@ -225,7 +220,10 @@ function node(onFinished) {
       _this.script("console.log(" + JSON.stringify(JSON.decycle(value)) + ")");
     },
     warn: function warn(value) {
-      _this.script("console.log(" + value + ")");
+      _this.script("console.warn(" + JSON.stringify(JSON.decycle(value)) + ")");
+    },
+    error: function error(value) {
+      _this.script("console.error(" + JSON.stringify(JSON.decycle(value)) + ")");
     }
   };
   node.prototype.timeNow = new Date(Date.now());
@@ -282,12 +280,12 @@ function cgiHttpSession(request, response) {
     response.session = this;
 
     // Get the session ID from the cookies. If there is no session ID stored then create a new ID and create a new file.
-    this.id = request.cookies.hasOwnProperty(config.SessionCookie) ? request.cookies[config.SessionCookie] : this.create();
-    var path = Path.join(config.SessionPath, this.id);
+    this.id = request.cookies.hasOwnProperty(config.sessionCookie) ? request.cookies[config.sessionCookie] : this.create();
+    var path = Path.join(config.sessionPath, this.id);
 
     // If the path doesn't exist, then create it.
-    if (!fs.existsSync(config.SessionPath)) {
-      fs.mkdirSync(config.SessionPath, 700);
+    if (!fs.existsSync(config.sessionPath)) {
+      fs.mkdirSync(config.sessionPath, 700);
     }
 
     // If the file does not exist then create another ID.
@@ -297,7 +295,7 @@ function cgiHttpSession(request, response) {
 
     // Load the session information.
     // TODO: handle exceptions, if occurs create new session.
-    var session = JSON.parse(fs.readFileSync(Path.join(config.SessionPath, this.id)));
+    var session = JSON.parse(fs.readFileSync(Path.join(config.sessionPath, this.id)));
 
     // Ensure the session is actually the requester's session.
     // TODO: create new session if this occurs. Don't throw exception.
@@ -346,15 +344,15 @@ function cgiHttpSession(request, response) {
     // Create the session object.
     var session = {
       id: id,
-      path: Path.join(config.SessionPath, id),
+      path: Path.join(config.sessionPath, id),
       ipAddress: request.server.remote_addr,
       cookies: {},
       data: {}
     };
 
     // Add the session ID cookie to it. {name: <string>, value: <string or array>, expires: <date>, domain: <string>, path: <string>, httpOnly: <boolean>, secure: <boolean>}
-    session.cookies[config.SessionCookie] = {
-      name: config.SessionCookie,
+    session.cookies[config.sessionCookie] = {
+      name: config.sessionCookie,
       value: id,
       httpOnly: true,
       notSent: true,
@@ -379,13 +377,13 @@ function cgiHttpSession(request, response) {
     var time = new Date().value;
 
     // Get the time out in milliseconds.
-    var timeOut = config.SessionTimeOut * 1000;
+    var timeOut = config.sessionTimeOut * 1000;
 
     // Get the list of files within the sessions folder.
-    var sessions = fs.readdirSync(config.SessionPath);
+    var sessions = fs.readdirSync(config.sessionPath);
     for (var index = 0; index < sessions.length; index++) {
       // Build the path and the file information.
-      var path = Path.join(config.SessionPath, sessions[index]);
+      var path = Path.join(config.sessionPath, sessions[index]);
       var stats = fs.statSync(path);
 
       // If the session has expired then delete the session file.
@@ -447,8 +445,8 @@ function cgiHttpResponse() {
     }
 
     // Traverse the session cookies and send any cookies that has not yet been sent or that has been updated.
-    for (var name in self.session.cookies) {
-      var cookie = self.session.cookies[name];
+    for (var _name in self.session.cookies) {
+      var cookie = self.session.cookies[_name];
       if (cookie.notSent === true) {
         delete cookie.notSent;
         process.stdout.write('Set-Cookie:' + cgiParser.serializeCookie(cookie) + '\r\n');
@@ -660,7 +658,6 @@ var cgiParser = {
     var writePrefix = 'response.write( __scripts[' + id + '].content[';
     var writeSuffix = ']);';
 
-    // Create the
     var script = {
       id: id,
       path: path,
@@ -673,7 +670,7 @@ var cgiParser = {
     // Read through all the given content looking for for <? ... ?> or <?= ... ?> sections.
     while (endIndex < content.length) {
       // Find the next index of the start tag.
-      var endIndex = content.indexOf(openTag, startIndex);
+      endIndex = content.indexOf(openTag, startIndex);
 
       // If found code section then find the end of it and append it to the blocks.
       if (endIndex >= 0) {
@@ -784,10 +781,18 @@ var cgiParser = {
     var pairs = [cookie.name + '=' + encodeURIComponent(cookie.value)];
 
     // Add any other fields to the cookie that have been set.
-    if (cookie.domain) pairs.push('Domain=' + cookie.domain);
-    if (cookie.path) pairs.push('Path=' + cookie.path);
-    if (cookie.expires) pairs.push('Expires=' + cookie.expires.toUTCString());
-    if (cookie.httpOnly) pairs.push('HttpOnly');
+    if (cookie.domain) {
+      pairs.push('Domain=' + cookie.domain);
+    }
+    if (cookie.path) {
+      pairs.push('Path=' + cookie.path);
+    }
+    if (cookie.expires) {
+      pairs.push('Expires=' + cookie.expires.toUTCString());
+    }
+    if (cookie.httpOnly) {
+      pairs.push('HttpOnly');
+    }
 
     // Finally return the joint cookie properties.
     return pairs.join('; ');
@@ -881,9 +886,6 @@ cgiNodeContext = node();
 var onReady = function onReady() {
   cgiNodeContext.include(process.env.PATH_TRANSLATED);
 };
-
-// TODO: remove this when the POST parser is done.
-//cgiNodeContext.request.method = 'GET';
 
 // If the HTTP method is a 'POST' then read the post data. Otherwise process is ready.
 if (cgiNodeContext.request.method !== 'POST') {
